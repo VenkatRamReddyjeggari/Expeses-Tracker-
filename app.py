@@ -3,13 +3,15 @@ import sqlite3
 from datetime import date, datetime
 from functools import wraps
 
-from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask import Flask, abort, flash, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from database.db import get_db, init_db, seed_db
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SPENDLY_SECRET_KEY", "dev-only-change-me")
+# Lax keeps the session cookie off cross-site POSTs, so other sites can't submit our forms.
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 
 init_db()
 seed_db()
@@ -224,21 +226,64 @@ def add_expense():
     return redirect(url_for("profile"))
 
 
-# ------------------------------------------------------------------ #
-# Placeholder routes — students will implement these                  #
-# ------------------------------------------------------------------ #
-
-
-@app.route("/expenses/<int:id>/edit")
+@app.route("/expenses/<int:id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_expense(id):
-    return "Edit expense — coming in Step 8"
+    conn = get_db()
+    # Scoped to the signed-in user, so nobody can edit someone else's expense by guessing an id.
+    expense = conn.execute(
+        "SELECT * FROM expenses WHERE id = ? AND user_id = ?", (id, session["user_id"])
+    ).fetchone()
+    if expense is None:
+        conn.close()
+        abort(404)
+
+    if request.method == "GET":
+        conn.close()
+        values = dict(expense)
+        values["amount"] = f"{expense['amount']:.2f}"
+        return render_template(
+            "expense_form.html", categories=CATEGORIES, values=values, editing=True
+        )
+
+    values, error = parse_expense_form(request.form)
+    if error:
+        conn.close()
+        return render_template(
+            "expense_form.html", categories=CATEGORIES, values=values, error=error, editing=True
+        ), 400
+
+    conn.execute(
+        "UPDATE expenses SET amount = ?, category = ?, date = ?, description = ? "
+        "WHERE id = ? AND user_id = ?",
+        (values["amount"], values["category"], values["date"], values["description"] or None,
+         id, session["user_id"]),
+    )
+    conn.commit()
+    conn.close()
+
+    flash(f"Updated ₹{format_inr(values['amount'])} for {values['category']}.")
+    return redirect(url_for("profile"))
 
 
-@app.route("/expenses/<int:id>/delete")
+@app.route("/expenses/<int:id>/delete", methods=["POST"])
 @login_required
 def delete_expense(id):
-    return "Delete expense — coming in Step 9"
+    conn = get_db()
+    expense = conn.execute(
+        "SELECT amount, category FROM expenses WHERE id = ? AND user_id = ?",
+        (id, session["user_id"]),
+    ).fetchone()
+    if expense is None:
+        conn.close()
+        abort(404)
+
+    conn.execute("DELETE FROM expenses WHERE id = ? AND user_id = ?", (id, session["user_id"]))
+    conn.commit()
+    conn.close()
+
+    flash(f"Deleted ₹{format_inr(expense['amount'])} for {expense['category']}.")
+    return redirect(url_for("profile"))
 
 
 if __name__ == "__main__":

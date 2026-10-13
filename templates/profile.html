@@ -69,7 +69,13 @@
                             <td>{{ e.description or "—" }}</td>
                             <td><span class="category-pill">{{ e.category }}</span></td>
                             <td class="num">₹{{ e.amount | inr }}</td>
-                            <td class="num"><a href="{{ url_for('edit_expense', id=e.id) }}" class="row-link">Edit</a></td>
+                            <td class="num row-actions">
+                                <a href="{{ url_for('edit_expense', id=e.id) }}" class="row-link">Edit</a>
+                                <form method="POST" action="{{ url_for('delete_expense', id=e.id) }}"
+                                      data-confirm="Delete ₹{{ e.amount | inr }} for {{ e.category }}? This can't be undone.">
+                                    <button type="submit" class="row-link row-link-danger">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
