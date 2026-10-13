@@ -447,6 +447,25 @@ a { color: inherit; text-decoration: none; }
 
 .form-input::placeholder { color: var(--ink-faint); }
 
+select.form-input { cursor: pointer; }
+
+.label-hint { font-weight: 400; color: var(--ink-faint); }
+
+.flash-wrap {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 1.5rem 2rem 0;
+}
+
+.flash {
+    background: var(--accent-light);
+    color: var(--accent);
+    border: 1px solid #cddfd3;
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+}
+
 .btn-submit {
     width: 100%;
     padding: 0.7rem;
@@ -508,6 +527,137 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* ------------------------------------------------------------------ */
+/* Profile                                                             */
+/* ------------------------------------------------------------------ */
+
+.profile-section {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 3rem 2rem;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.profile-title {
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.2;
+}
+
+.profile-meta {
+    font-size: 0.9rem;
+    color: var(--ink-muted);
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card,
+.profile-card {
+    background: var(--paper-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+}
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.stat-value {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.profile-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 1.25rem;
+}
+
+.category-row { grid-template-columns: 100px 1fr 90px; }
+
+.table-wrap { overflow-x: auto; }
+
+.expense-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.expense-table th {
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0 0.75rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.expense-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-soft);
+    color: var(--ink-soft);
+    white-space: nowrap;
+}
+
+.expense-table tr:last-child td { border-bottom: none; }
+.expense-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.expense-table .muted { color: var(--ink-muted); }
+
+.category-pill {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+}
+
+.row-link {
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+}
+
+.row-link:hover { color: var(--accent); text-decoration: underline; }
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: var(--ink-muted);
+}
+
+.empty-state p { margin-bottom: 1.25rem; }
+
+/* ------------------------------------------------------------------ */
 /* Responsive                                                          */
 /* ------------------------------------------------------------------ */
 
@@ -522,9 +672,15 @@ a { color: inherit; text-decoration: none; }
     .hero-visual { display: none; }
 
     .features-inner { grid-template-columns: 1fr; }
+
+    .profile-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 600px) {
     .nav-links a:not(.nav-cta) { display: none; }
     .hero { padding: 3rem 1rem 2rem; }
+
+    .profile-section { padding: 2rem 1rem; }
+    .flash-wrap { padding: 1rem 1rem 0; }
+    .stat-grid { grid-template-columns: 1fr; }
 }

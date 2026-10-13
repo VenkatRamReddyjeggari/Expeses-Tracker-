@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.name }} — Spendly{% endblock %}
+
+{% block content %}
+
+<section class="profile-section">
+
+    <div class="profile-header">
+        <div>
+            <h1 class="profile-title">Hi, {{ user.name }}</h1>
+            <p class="profile-meta">{{ user.email }} · Member since {{ user.created_at[:10] }}</p>
+        </div>
+        <a href="{{ url_for('add_expense') }}" class="btn-primary">+ Add expense</a>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card">
+            <span class="mock-label">Total spent</span>
+            <span class="stat-value">₹{{ totals.total | inr }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="mock-label">This month</span>
+            <span class="stat-value">₹{{ totals.this_month | inr }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="mock-label">Expenses</span>
+            <span class="stat-value">{{ totals.count }}</span>
+        </div>
+    </div>
+
+    {% if expenses %}
+    <div class="profile-grid">
+
+        <div class="profile-card">
+            <h2 class="profile-card-title">By category</h2>
+            <div class="mock-bars">
+                {% set top = categories[0].total %}
+                {% for c in categories %}
+                <div class="mock-bar-row category-row">
+                    <span class="mock-cat">{{ c.category }}</span>
+                    <div class="mock-bar-track">
+                        <div class="mock-bar mock-bar-{{ loop.index0 % 4 + 1 }}"
+                             style="width: {{ (c.total / top * 100) | round(1) }}%"></div>
+                    </div>
+                    <span class="mock-amt">₹{{ c.total | inr }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="profile-card">
+            <h2 class="profile-card-title">Recent expenses</h2>
+            <div class="table-wrap">
+                <table class="expense-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th class="num">Amount</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in expenses %}
+                        <tr>
+                            <td class="muted">{{ e.date }}</td>
+                            <td>{{ e.description or "—" }}</td>
+                            <td><span class="category-pill">{{ e.category }}</span></td>
+                            <td class="num">₹{{ e.amount | inr }}</td>
+                            <td class="num"><a href="{{ url_for('edit_expense', id=e.id) }}" class="row-link">Edit</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    {% else %}
+    <div class="profile-card empty-state">
+        <p>No expenses yet. Add your first one to start tracking.</p>
+        <a href="{{ url_for('add_expense') }}" class="btn-ghost">Add expense</a>
+    </div>
+    {% endif %}
+
+</section>
+
+{% endblock %}
